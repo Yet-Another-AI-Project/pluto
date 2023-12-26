@@ -13,7 +13,8 @@ import (
 	"github.com/rs/cors"
 	"go.uber.org/fx"
 
-	"github.com/MuShare/pluto/config"
+	"pluto/config"
+
 	httpServer "github.com/asim/go-micro/plugins/server/http/v3"
 )
 

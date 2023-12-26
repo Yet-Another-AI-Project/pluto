@@ -9,12 +9,12 @@ import (
 
 	"github.com/gorilla/mux"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
-	"github.com/MuShare/pluto/datatype/request"
-	"github.com/MuShare/pluto/manage"
-	"github.com/MuShare/pluto/utils/general"
-	"github.com/MuShare/pluto/utils/mail"
-	routeUtils "github.com/MuShare/pluto/utils/route"
+	perror "pluto/datatype/pluto_error"
+	"pluto/datatype/request"
+	"pluto/manage"
+	"pluto/utils/general"
+	"pluto/utils/mail"
+	routeUtils "pluto/utils/route"
 )
 
 func (router *Router) Login(w http.ResponseWriter, r *http.Request) *perror.PlutoError {

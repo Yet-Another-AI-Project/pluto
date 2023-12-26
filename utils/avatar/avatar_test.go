@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MuShare/pluto/utils/avatar"
+	"pluto/utils/avatar"
+
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,11 +1,12 @@
 package salt
 
 import (
-	"math/rand"
 	"encoding/base64"
+	"math/rand"
 	"strings"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
+	perror "pluto/datatype/pluto_error"
+
 	"golang.org/x/crypto/scrypt"
 )
 

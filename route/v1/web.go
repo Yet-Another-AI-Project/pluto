@@ -3,11 +3,12 @@ package v1
 import (
 	"net/http"
 
+	perror "pluto/datatype/pluto_error"
+	"pluto/datatype/request"
+	"pluto/utils/general"
+	routeUtils "pluto/utils/route"
+
 	"github.com/gorilla/mux"
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
-	"github.com/MuShare/pluto/datatype/request"
-	"github.com/MuShare/pluto/utils/general"
-	routeUtils "github.com/MuShare/pluto/utils/route"
 )
 
 func (router *Router) RegistrationVerifyPage(w http.ResponseWriter, r *http.Request) *perror.PlutoError {

@@ -3,7 +3,7 @@ package request
 import (
 	"strings"
 
-	"github.com/MuShare/pluto/utils/general"
+	"pluto/utils/general"
 )
 
 const (

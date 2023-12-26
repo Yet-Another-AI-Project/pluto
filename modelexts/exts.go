@@ -3,7 +3,7 @@ package modelexts
 import (
 	"strconv"
 
-	"github.com/MuShare/pluto/models"
+	"pluto/models"
 )
 
 type User struct {

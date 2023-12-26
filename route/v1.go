@@ -3,7 +3,7 @@ package route
 import (
 	"path"
 
-	"github.com/MuShare/pluto/middleware"
+	"pluto/middleware"
 )
 
 func (r *Router) registerUserV1Routes(prefix string) {

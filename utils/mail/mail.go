@@ -7,13 +7,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/MuShare/pluto/utils/view"
+	"pluto/utils/view"
+
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 
-	"github.com/MuShare/pluto/config"
-	"github.com/MuShare/pluto/utils/jwt"
+	"pluto/config"
+	"pluto/utils/jwt"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
+	perror "pluto/datatype/pluto_error"
 )
 
 type Mail struct {

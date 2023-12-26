@@ -1,9 +1,5 @@
 # Pluto
 
-[![Build Status](https://travis-ci.org/mushare/pluto.svg?branch=master)](https://travis-ci.org/mushare/pluto)
-[![Go Report Card](https://goreportcard.com/badge/github.com/MuShare/pluto)](https://goreportcard.com/report/github.com/MuShare/pluto)
-[![Gitter](https://badges.gitter.im/pluto-discuss/community.svg)](https://gitter.im/pluto-discuss/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
 Pluto is a JWT based authorization/authentication service. Besides providing a basic user registration and login feature, Pluto also provides a RBAC management to control the user's permission. Pluto implements the OAuth2 specified APIs for authorization.
 
 ## Setup

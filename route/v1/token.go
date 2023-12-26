@@ -3,10 +3,10 @@ package v1
 import (
 	"net/http"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
-	"github.com/MuShare/pluto/datatype/request"
-	routeUtils "github.com/MuShare/pluto/utils/route"
-	"github.com/MuShare/pluto/utils/rsa"
+	perror "pluto/datatype/pluto_error"
+	"pluto/datatype/request"
+	routeUtils "pluto/utils/route"
+	"pluto/utils/rsa"
 )
 
 func (router *Router) RefreshToken(w http.ResponseWriter, r *http.Request) *perror.PlutoError {

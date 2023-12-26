@@ -9,8 +9,9 @@ import (
 	"path"
 	"regexp"
 
+	"pluto/config"
+
 	"github.com/alecthomas/template"
-	"github.com/MuShare/pluto/config"
 	"golang.org/x/text/language"
 )
 

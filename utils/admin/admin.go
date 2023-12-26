@@ -7,17 +7,17 @@ import (
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 
-	"github.com/MuShare/pluto/utils/general"
-	"github.com/MuShare/pluto/utils/mail"
-	"github.com/MuShare/pluto/utils/salt"
+	"pluto/utils/general"
+	"pluto/utils/mail"
+	"pluto/utils/salt"
 
-	"github.com/MuShare/pluto/datatype/request"
+	"pluto/datatype/request"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
-	"github.com/MuShare/pluto/manage"
+	perror "pluto/datatype/pluto_error"
+	"pluto/manage"
 
-	"github.com/MuShare/pluto/config"
-	plog "github.com/MuShare/pluto/log"
+	"pluto/config"
+	plog "pluto/log"
 )
 
 func Init(db *sql.DB, config *config.Config, bundle *i18n.Bundle) *perror.PlutoError {

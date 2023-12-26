@@ -8,9 +8,9 @@ import (
 
 	"github.com/urfave/negroni"
 
-	routeUtils "github.com/MuShare/pluto/utils/route"
+	routeUtils "pluto/utils/route"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
+	perror "pluto/datatype/pluto_error"
 )
 
 func (router *Router) plutoHandlerWrapper(handler func(http.ResponseWriter, *http.Request) *perror.PlutoError) negroni.HandlerFunc {

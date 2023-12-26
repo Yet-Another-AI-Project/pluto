@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"time"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
-	"github.com/MuShare/pluto/datatype/request"
-	"github.com/MuShare/pluto/models"
-	"github.com/MuShare/pluto/utils/jwt"
+	perror "pluto/datatype/pluto_error"
+	"pluto/datatype/request"
+	"pluto/models"
+	"pluto/utils/jwt"
+
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 

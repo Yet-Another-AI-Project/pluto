@@ -4,11 +4,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/MuShare/pluto/config"
+	"pluto/config"
 
-	"github.com/MuShare/pluto/database"
+	"pluto/database"
 
-	"github.com/MuShare/pluto/utils/migrate"
+	"pluto/utils/migrate"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 

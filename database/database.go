@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/MuShare/pluto/config"
+	"pluto/config"
 )
 
 func NewDatabase(config *config.Config) (*sql.DB, error) {

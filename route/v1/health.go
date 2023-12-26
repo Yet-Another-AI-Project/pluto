@@ -3,8 +3,8 @@ package v1
 import (
 	"net/http"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
-	routeUtils "github.com/MuShare/pluto/utils/route"
+	perror "pluto/datatype/pluto_error"
+	routeUtils "pluto/utils/route"
 )
 
 func (router *Router) HealthCheck(w http.ResponseWriter, r *http.Request) *perror.PlutoError {

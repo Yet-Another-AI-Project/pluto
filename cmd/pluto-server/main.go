@@ -8,26 +8,29 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/MuShare/pluto/localization"
+	"pluto/localization"
+
 	"github.com/k0kubun/pp"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 
-	"github.com/MuShare/pluto/manage"
-	"github.com/MuShare/pluto/utils/admin"
+	"pluto/manage"
+	"pluto/utils/admin"
 
-	"github.com/MuShare/pluto/server"
+	"pluto/server"
 
-	plog "github.com/MuShare/pluto/log"
-	"github.com/MuShare/pluto/route"
+	plog "pluto/log"
+	"pluto/route"
 
-	"github.com/MuShare/pluto/config"
+	"pluto/config"
+
 	"go.uber.org/fx"
 
-	"github.com/MuShare/pluto/database"
+	"pluto/database"
 
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
-	"github.com/MuShare/pluto/utils/rsa"
-	"github.com/MuShare/pluto/utils/view"
+	perror "pluto/datatype/pluto_error"
+	"pluto/utils/rsa"
+	"pluto/utils/view"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 

@@ -8,11 +8,12 @@ import (
 	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/wxnacy/wgo/arrays"
 
-	"github.com/MuShare/pluto/config"
-	perror "github.com/MuShare/pluto/datatype/pluto_error"
-	plog "github.com/MuShare/pluto/log"
-	"github.com/MuShare/pluto/modelexts"
-	"github.com/MuShare/pluto/models"
+	"pluto/config"
+	perror "pluto/datatype/pluto_error"
+	plog "pluto/log"
+	"pluto/modelexts"
+	"pluto/models"
+
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 

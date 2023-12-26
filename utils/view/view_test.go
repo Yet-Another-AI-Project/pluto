@@ -3,8 +3,9 @@ package view_test
 import (
 	"testing"
 
-	"github.com/MuShare/pluto/config"
-	"github.com/MuShare/pluto/utils/view"
+	"pluto/config"
+	"pluto/utils/view"
+
 	"github.com/stretchr/testify/assert"
 )
 
