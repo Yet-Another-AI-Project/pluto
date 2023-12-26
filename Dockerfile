@@ -1,10 +1,10 @@
-FROM golang:1.16 as build
+FROM golang:1.20 as build
 
 ARG VERSION
 
-ADD . /go/src/github.com/MuShare/pluto
+ADD . /go/src/pluto
 
-WORKDIR /go/src/github.com/MuShare/pluto
+WORKDIR /go/src/pluto
 
 RUN  export GO111MODULE=on GOPROXY=https://proxy.golang.org && \ 
   go build -ldflags="-X 'main.VERSION=${VERSION}'" -o pluto-server cmd/pluto-server/main.go && \
@@ -19,12 +19,12 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-COPY --from=build /go/src/github.com/MuShare/pluto/pluto-server /usr/bin/
+COPY --from=build /go/src/pluto/pluto-server /usr/bin/
 
-COPY --from=build /go/src/github.com/MuShare/pluto/pluto-migrate /usr/bin/
+COPY --from=build /go/src/pluto/pluto-migrate /usr/bin/
 
-COPY --from=build /go/src/github.com/MuShare/pluto/views views/
+COPY --from=build /go/src/pluto/views views/
 
-COPY --from=build /go/src/github.com/MuShare/pluto/localization/*.toml localization/
+COPY --from=build /go/src/pluto/localization/*.toml localization/
 
 ENTRYPOINT ["/usr/bin/pluto-server"]
