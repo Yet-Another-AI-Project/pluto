@@ -5,8 +5,8 @@ Pluto is a JWT based authorization/authentication service. Besides providing a b
 ## Setup
 
 ### Environments
-- Go: >1.13, <=1.16
-- Database: MySQL 5.7 or later
+- Go: >= 1.20
+- Database: MySQL >= 5.7
 
 
 #### Go version
@@ -24,17 +24,19 @@ github.com/marten-seemann/qtls-go1-15.init.0()
 
 ```bash
 # install sqlboiler
-$ go install -v github.com/volatiletech/sqlboiler@v3.6.0
-$ go install -v github.com/volatiletech/sqlboiler/drivers/sqlboiler-mysql@v3.6.0
+$ go install -v github.com/volatiletech/sqlboiler
+$ go install -v github.com/volatiletech/sqlboiler/drivers/sqlboiler-mysql
 $ git clone ...
+
 # start mysql and create `pluto` database
 $ make migrate-binary-build
 # run migrations
-$ ./bin/pluto-migrate
+$ ./bin/pluto-migrate --config.file=config.json
+
 # build server
 $ make server-binary-build
 # start server
-$ pluto-server
+$ ./bin/pluto-server --config.file=config.json
 ```
 
 ## Main Features
@@ -61,14 +63,6 @@ Here are some helpful documents for reading.
 * [Replace Views](https://github.com/MuShare/pluto/blob/master/docs/view.md) is a guide for replacing the default html pages with your own custom files
 * [JWT Token](https://github.com/MuShare/pluto/blob/master/docs/jwt.md) gives an introduction of the JWT design in Pluto.
 * [WeChat Login](https://github.com/MuShare/pluto/blob/master/docs/wechat.md) gives an introduction of signing in with WeChat QRCode.
-
-## Docker image
-
-https://hub.docker.com/repository/docker/mushare/pluto
-
-## Contribute
-
-Feel free to fire an issue or send a pull request.
 
 ## License
 
