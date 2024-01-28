@@ -8,7 +8,6 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 
 	"pluto/utils/general"
-	"pluto/utils/mail"
 	"pluto/utils/salt"
 
 	"pluto/datatype/request"
@@ -17,19 +16,12 @@ import (
 	"pluto/manage"
 
 	"pluto/config"
-	plog "pluto/log"
 )
 
 func Init(db *sql.DB, config *config.Config, bundle *i18n.Bundle) *perror.PlutoError {
 
 	if config.Admin.Mail == "" {
 		return nil
-	}
-
-	logger, err := plog.NewLogger(config)
-
-	if err != nil {
-		return perror.ServerError.Wrapper(err)
 	}
 
 	manager, err := manage.NewManager(db, config, nil)
@@ -108,6 +100,7 @@ func Init(db *sql.DB, config *config.Config, bundle *i18n.Bundle) *perror.PlutoE
 		return perr
 	}
 	mr.Name = name
+	mr.AppName = general.PlutoApplication
 	mr.Password = password
 	user, perr := manager.RegisterWithEmail(mr, true)
 	if perr != nil && perr.PlutoCode != perror.MailIsAlreadyRegister.PlutoCode {
@@ -120,18 +113,17 @@ func Init(db *sql.DB, config *config.Config, bundle *i18n.Bundle) *perror.PlutoE
 
 		log.Println(mailBody)
 
-		ml, err := mail.NewMail(config, bundle)
-		if err != nil {
-			logger.Error("smtp server is not set, can't send the mail")
-			return err
-		}
-		if err := ml.SendPlainText(mr.Mail, "[Pluto]Admin Password", mailBody); err != nil {
-			logger.Error("send mail failed: " + err.LogError.Error())
-			return err
-		} else {
-			logger.Info("Mail with your admin login info has been sent")
-		}
-
+		// ml, err := mail.NewMail(config, bundle)
+		// if err != nil {
+		// 	logger.Error("smtp server is not set, can't send the mail")
+		// 	return err
+		// }
+		// if err := ml.SendPlainText(mr.Mail, "[Pluto]Admin Password", mailBody); err != nil {
+		// 	logger.Error("send mail failed: " + err.LogError.Error())
+		// 	return err
+		// } else {
+		// 	logger.Info("Mail with your admin login info has been sent")
+		// }
 	}
 
 	rsu := request.RoleScopeUpdate{}

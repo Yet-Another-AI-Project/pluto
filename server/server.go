@@ -6,16 +6,11 @@ import (
 
 	"log"
 
-	"github.com/asim/go-micro/v3"
-	"github.com/asim/go-micro/v3/registry"
-	"github.com/asim/go-micro/v3/server"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"go.uber.org/fx"
 
 	"pluto/config"
-
-	httpServer "github.com/asim/go-micro/plugins/server/http/v3"
 )
 
 type Server struct {
@@ -42,26 +37,12 @@ func NewMux(lc fx.Lifecycle, config *config.Config) *mux.Router {
 		AllowedHeaders: config.Cors.AllowedHeaders,
 	})
 
-	// microservices
-	var rgy registry.Registry
-	// TODO(cj): consul
-	rgy = registry.NewRegistry()
-
-	srv := httpServer.NewServer(
-		server.Name(config.Server.ServerName),
-		server.Address(address),
-	)
-
 	handler := c.Handler(router)
-	hd := srv.NewHandler(handler)
-	srv.Handle(hd)
-	// ctx, cancel := context.WithCancel(context.Background())
-	service := micro.NewService(
-		micro.Server(srv),
-		micro.Name(config.Registry.ServiceName),
-		// micro.Context(ctx),
-		micro.Registry(rgy),
-	)
+
+	srv := &http.Server{
+		Addr:    address,
+		Handler: handler,
+	}
 
 	lc.Append(fx.Hook{
 		// To mitigate the impact of deadlocks in application startup and
@@ -69,19 +50,21 @@ func NewMux(lc fx.Lifecycle, config *config.Config) *mux.Router {
 		// default, hooks have a total of 30 seconds to complete. Timeouts are
 		// passed via Go's usual context.Context.
 		OnStart: func(context.Context) error {
-			log.Println("Starting Pluto server at " + address)
-			// In production, we'd want to separate the Listen and Serve phases for
-			// better error-handling.
-			go service.Run()
+			go func() {
+				log.Printf("Pluto server start listen at %s\n", address)
+				if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+					log.Fatalf("Pluto server listen error: %s\n", err)
+				}
+			}()
 			return nil
 		},
-		// OnStop: func(ctx context.Context) error {
-		// 	log.Println("Stopping Pluto server")
-		// 	cancel()
-		// 	// wait for consul deregister
-		// 	time.Sleep(5 * time.Second)
-		// 	return nil
-		// },
+		OnStop: func(ctx context.Context) error {
+			log.Println("Pluto server shutdown...")
+			if err := srv.Shutdown(ctx); err != nil {
+				log.Fatalf("Pluto server shutdown error: %s\n", err)
+			}
+			return nil
+		},
 	})
 	return router
 }

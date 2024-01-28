@@ -54,6 +54,7 @@ func register(router *route.Router, db *sql.DB, config *config.Config, bundle *i
 			log.Fatalln(err.LogError.Error())
 			return err.LogError
 		}
+		log.Print(err)
 	}
 
 	// register routes
