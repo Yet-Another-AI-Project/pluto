@@ -103,7 +103,7 @@ func (m *Mail) SendRegisterVerify(userID uint, address string, baseURL string, l
 		},
 	})
 	if err != nil {
-		subject = "[Pluto] Mail Confirmation"
+		subject = "[Kiwi] Mail Confirmation"
 	}
 	if err := m.Send(address, subject, "text/html", buffer.String()); err != nil {
 		return perror.ServerError.Wrapper(errors.New("Mail sending failed: " + err.Error()))
@@ -145,7 +145,7 @@ func (m *Mail) SendResetPassword(appID, address string, baseURL string, userLang
 		},
 	})
 	if err != nil {
-		subject = "[Pluto]Password Reset"
+		subject = "[Kiwi] Password Reset"
 	}
 	if err := m.Send(address, subject, "text/html", buffer.String()); err != nil {
 		return perror.ServerError.Wrapper(errors.New("Mail sending failed: " + err.Error()))

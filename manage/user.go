@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -214,6 +215,7 @@ func (m *Manager) newUser(exec boil.Executor, name, avatar, password string, use
 		user.UserID = *userID
 		user.UserIDUpdated = true
 	} else {
+		// TODO: change to short id
 		newUuid, uuidErr := uuid.NewRandom()
 		if uuidErr != nil {
 			return nil, perror.ServerError.Wrapper(uuidErr)
@@ -587,7 +589,7 @@ func getWechatWebLoginInfo(code string, appID string, appSecret string) (openID 
 		return "", "", perror.ServerError.Wrapper(err)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", perror.ServerError.Wrapper(err)
 	}

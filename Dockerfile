@@ -10,7 +10,7 @@ RUN  export GO111MODULE=on GOPROXY=https://proxy.golang.org && \
   go build -ldflags="-X 'main.VERSION=${VERSION}'" -o pluto-server cmd/pluto-server/main.go && \
   go build -o pluto-migrate cmd/pluto-migrate/main.go
 
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y wget
 
