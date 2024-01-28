@@ -14,12 +14,12 @@ require (
 	github.com/friendsofgo/errors v0.9.2
 	github.com/go-kit/kit v0.13.0
 	github.com/go-sql-driver/mysql v1.7.1
-	github.com/google/uuid v1.5.0
 	github.com/gorilla/context v1.1.2
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.2.1
 	github.com/k0kubun/pp v3.0.1+incompatible
 	github.com/leeif/kiper v0.6.0
+	github.com/lithammer/shortuuid/v4 v4.0.0
 	github.com/nicksnyder/go-i18n/v2 v2.3.0
 	github.com/rs/cors v1.10.1
 	github.com/stretchr/testify v1.8.4
@@ -53,6 +53,7 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/uuid v1.5.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect

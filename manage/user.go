@@ -7,16 +7,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/BillSJC/appleLogin"
+	"github.com/lithammer/shortuuid/v4"
 	"github.com/volatiletech/sqlboiler/boil"
 
 	"github.com/volatiletech/sqlboiler/queries/qm"
@@ -215,13 +213,9 @@ func (m *Manager) newUser(exec boil.Executor, name, avatar, password string, use
 		user.UserID = *userID
 		user.UserIDUpdated = true
 	} else {
-		// TODO: change to short id
-		newUuid, uuidErr := uuid.NewRandom()
-		if uuidErr != nil {
-			return nil, perror.ServerError.Wrapper(uuidErr)
-		}
-		if uuidString := newUuid.String(); uuidString != "" {
-			user.UserID = uuidString
+		newUuid := shortuuid.New()
+		if newUuid != "" {
+			user.UserID = newUuid
 			user.UserIDUpdated = false
 		} else {
 			return nil, perror.ServerError.Wrapper(errors.New("invalid uuid"))
@@ -643,7 +637,7 @@ func getWechatAccessToken(code string, appID string, appSecret string) (accessTo
 		return "", "", perror.ServerError.Wrapper(err)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", "", perror.ServerError.Wrapper(err)
 	}
@@ -711,7 +705,7 @@ func getWechatUserInfo(accessToken string, openID string) (info *wechatUserInfo,
 		return nil, perror.ServerError.Wrapper(err)
 	}
 
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, perror.ServerError.Wrapper(err)
 	}
