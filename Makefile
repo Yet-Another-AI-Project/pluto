@@ -29,7 +29,7 @@ run: install
 
 server-binary-build:
 	mkdir -p bin
-	GO111MODULE=on go build -ldflags="-X 'main.VERSION=$(VERSION)'" -o bin/pluto-server cmd/pluto-server/main.go
+	go build -ldflags="-X 'main.VERSION=$(VERSION)'" -o bin/pluto-server cmd/pluto-server/main.go
 
 migrate-binary-build:
 	mkdir -p bin
