@@ -2,10 +2,8 @@ package mail
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"net/http"
+	"log"
 
 	"pluto/utils/view"
 
@@ -14,53 +12,39 @@ import (
 	"pluto/config"
 	"pluto/utils/jwt"
 
+	"github.com/resend/resend-go/v2"
+
 	perror "pluto/datatype/pluto_error"
 )
 
 type Mail struct {
 	config *config.Config
 	bundle *i18n.Bundle
-}
-
-type SendMailRequest struct {
-	To          string `json:"to"`
-	Subject     string `json:"subject"`
-	ContentType string `json:"content_type"`
-	Body        string `json:"body"`
-}
-
-type SendMailResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"msg"`
+	resend *resend.Client
 }
 
 func (m *Mail) Send(recv, subj, contentType, body string) error {
-	requestJson, err := json.Marshal(SendMailRequest{
-		To:          recv,
-		Subject:     subj,
-		ContentType: contentType,
-		Body:        body,
-	})
-	if err != nil {
-		return err
+
+	params := &resend.SendEmailRequest{
+		From:    "noreply@mail.kiwiworlds.com",
+		To:      []string{recv},
+		Subject: subj,
 	}
-	res, err := http.Post(fmt.Sprintf("%s/api/v1/send-mail", *m.config.Mail.MailSenderPoolBaseUrl), "application/json", bytes.NewBuffer(requestJson))
+
+	if contentType == "text/plain" {
+		params.Text = body
+	} else if contentType == "text/html" {
+		params.Html = body
+	}
+
+	sent, err := m.resend.Emails.Send(params)
+
 	if err != nil {
 		return err
 	}
 
-	defer res.Body.Close()
-	var response SendMailResponse
-	if res.StatusCode == http.StatusOK {
-		if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-			return err
-		}
-		if response.Code != 200 {
-			return errors.New(fmt.Sprintf("mail sender pool response is %d", response.Code))
-		}
-	} else {
-		return errors.New(fmt.Sprintf("mail sender pool http request failed with status: %d", res.StatusCode))
-	}
+	log.Printf("Mail sent with message id: %s\n", sent.Id)
+
 	return nil
 }
 
@@ -155,12 +139,16 @@ func (m *Mail) SendResetPassword(appID, address string, baseURL string, userLang
 
 func NewMail(config *config.Config, bundle *i18n.Bundle) (*Mail, *perror.PlutoError) {
 	c := config.Mail
-	if *c.MailSenderPoolBaseUrl == "" {
-		return nil, perror.ServerError.Wrapper(errors.New("mail sender pool base url is not set"))
+	if c.Key == "" {
+		return nil, perror.ServerError.Wrapper(errors.New("mail key is not set"))
 	}
+
+	resend := resend.NewClient(c.Key)
+
 	mail := &Mail{
 		config: config,
 		bundle: bundle,
+		resend: resend,
 	}
 	return mail, nil
 }

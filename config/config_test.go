@@ -46,7 +46,6 @@ func TestConfigDefault(t *testing.T) {
 	assert.Equal(t, "3306", c.Database.Port.String(), "default of database port should be 3306")
 	assert.Equal(t, "", c.Database.Password, "default of database port should be empty")
 	assert.Equal(t, "pluto", c.Database.DB, "default of database port should be pluto")
-	assert.Equal(t, "localhost", *c.Mail.MailSenderPoolBaseUrl, "default of database port should be empty")
 }
 
 func TestConfigCustom(t *testing.T) {
@@ -70,9 +69,6 @@ func TestConfigCustom(t *testing.T) {
 			"port": "3306",
 			"password": "www",
 			"db": "pluto_server"
-		},
-		"mail": {
-			"mail-sender-pool-base-url": "localhost"
 		}
 	}`); err != nil {
 		t.Fatal(err)
@@ -102,6 +98,4 @@ func TestConfigCustom(t *testing.T) {
 	assert.Equal(t, "3306", c.Database.Port.String(), "database port should be 3306")
 	assert.Equal(t, "www", c.Database.Password, "database port should be empty")
 	assert.Equal(t, "pluto_server", c.Database.DB, "database port should be empty")
-
-	assert.Equal(t, "localhost", *c.Mail.MailSenderPoolBaseUrl, "database port should be empty")
 }

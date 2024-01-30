@@ -1,7 +1,7 @@
 package config
 
 type MailConfig struct {
-	MailSenderPoolBaseUrl *string `kiper_value:"name:mail-sender-pool-base-url;help:mail sender pool host"`
+	Key string `kiper_value:"name:key;help:mailer send api key"`
 }
 
 type SMTP struct {

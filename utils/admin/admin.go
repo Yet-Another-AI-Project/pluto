@@ -8,6 +8,7 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 
 	"pluto/utils/general"
+	"pluto/utils/mail"
 	"pluto/utils/salt"
 
 	"pluto/datatype/request"
@@ -113,17 +114,17 @@ func Init(db *sql.DB, config *config.Config, bundle *i18n.Bundle) *perror.PlutoE
 
 		log.Println(mailBody)
 
-		// ml, err := mail.NewMail(config, bundle)
-		// if err != nil {
-		// 	logger.Error("smtp server is not set, can't send the mail")
-		// 	return err
-		// }
-		// if err := ml.SendPlainText(mr.Mail, "[Pluto]Admin Password", mailBody); err != nil {
-		// 	logger.Error("send mail failed: " + err.LogError.Error())
-		// 	return err
-		// } else {
-		// 	logger.Info("Mail with your admin login info has been sent")
-		// }
+		ml, err := mail.NewMail(config, bundle)
+		if err != nil {
+			log.Println("smtp server is not set, can't send the mail")
+			return err
+		}
+		if err := ml.SendPlainText(mr.Mail, "[Pluto]Admin Password", mailBody); err != nil {
+			log.Println("send mail failed: " + err.LogError.Error())
+			return err
+		} else {
+			log.Println("Mail with your admin login info has been sent")
+		}
 	}
 
 	rsu := request.RoleScopeUpdate{}

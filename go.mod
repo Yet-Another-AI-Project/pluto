@@ -19,6 +19,7 @@ require (
 	github.com/leeif/kiper v0.6.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
 	github.com/nicksnyder/go-i18n/v2 v2.3.0
+	github.com/resend/resend-go/v2 v2.4.0
 	github.com/rs/cors v1.10.1
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/negroni v1.0.0
