@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -41,7 +40,7 @@ func (ag *AvatarGen) GenFromBase64String(avatar string) (*AvatarReader, *perror.
 		return nil, perror.ServerError.Wrapper(fmt.Errorf("input is not in base64 format"))
 	}
 	ar := &AvatarReader{}
-	ar.Reader = ioutil.NopCloser(bytes.NewReader(b))
+	ar.Reader = io.NopCloser(bytes.NewReader(b))
 	ct := http.DetectContentType(b)
 	for _, vat := range validAvatarType {
 		if strings.Contains(ct, vat) {
@@ -58,7 +57,7 @@ func (ag *AvatarGen) GenFromBase64String(avatar string) (*AvatarReader, *perror.
 
 func (ag *AvatarGen) GenFromGravatar() (*AvatarReader, *perror.PlutoError) {
 	ar := &AvatarReader{}
-	originURL := fmt.Sprintf("https://www.gravatar.com/avatar/%s?f=y&d=identicon", randToken(8))
+	originURL := fmt.Sprintf("https://cravatar.cn/avatar/%s?f=y&d=identicon", randToken(8))
 	resp, err := http.Get(originURL)
 	if err != nil {
 		return nil, perror.ServerError.Wrapper(err)

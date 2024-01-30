@@ -1196,17 +1196,17 @@ func (m *Manager) RegisterWithEmail(register request.MailRegister, admin bool) (
 		return nil, perr
 	}
 
-	// avatarURL, perr := m.genAvatarFromGravatar()
-	// if perr != nil {
-	// 	return nil, perr
-	// }
+	avatarURL, perr := m.genAvatarFromGravatar()
+	if perr != nil {
+		return nil, perr
+	}
 
 	verified := false
 	if m.config.Server.SkipRegisterVerifyMail || admin {
 		verified = true
 	}
 
-	user, perr := m.newUser(tx, register.Name, "", encodedPassword, userID, verified, register.AppName)
+	user, perr := m.newUser(tx, register.Name, avatarURL, encodedPassword, userID, verified, register.AppName)
 	if perr != nil {
 		return nil, perr
 	}
