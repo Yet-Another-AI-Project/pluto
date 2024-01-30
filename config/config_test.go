@@ -32,7 +32,7 @@ func deleteConfigFile(path string) error {
 }
 
 func TestConfigDefault(t *testing.T) {
-	args := []string{"test", "--mail.mail-sender-pool-base-url", "localhost"}
+	args := []string{"test"}
 	// Init config file from command line and config file
 	c, err := config.NewConfig(args, "")
 
