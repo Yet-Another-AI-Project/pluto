@@ -157,7 +157,7 @@ Login with apple account for mobile app
 * request:
 
 ```
-{"code":<string>, "name":<string>, "device_id":<string>, "app_id":<string>}
+{"code":<string>, "name":<string>, "device_id":<string|optional>, "app_id":<string>}
 ```
 
 Code is the token for verifying the register and getting the user's info like id and email
@@ -186,7 +186,7 @@ Offical docs [wechat](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/
 * request:
 
 ```
-{"code":<string>, "device_id":<string>, "app_id":<string>}
+{"code":<string>, "device_id":<string|optional>, "app_id":<string>}
 ```
 
 Code is the token for exchanging the access token of wechat
