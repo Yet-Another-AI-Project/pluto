@@ -9,7 +9,7 @@ import (
 	"pluto/models"
 	"pluto/utils/jwt"
 
-	"github.com/volatiletech/sqlboiler/queries/qm"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 func (m *Manager) RefreshAccessToken(rat request.RefreshAccessToken) (*GrantResult, *perror.PlutoError) {

@@ -4,9 +4,11 @@ no-tests = true
 no-context = true
 
 [mysql]
-dbname = "pluto"
-host = "localhost"
-user = "root"
+dbname  = "pluto"
+host    = "127.0.0.1"
+port    = 3307
+user    = "root"
+pass    = "test"
 sslmode = "false"
 
 #[imports.all]

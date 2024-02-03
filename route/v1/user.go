@@ -108,6 +108,24 @@ func (router *Router) WechatLoginMobile(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+func (router *Router) WechatLoginMiniprogram(w http.ResponseWriter, r *http.Request) *perror.PlutoError {
+	login := request.WechatMiniprogramLogin{}
+
+	if err := routeUtils.GetRequestData(r, &login); err != nil {
+		return err
+	}
+
+	res, err := router.manager.WechatLoginMiniprogram(login.AppID, login.Code)
+
+	if err != nil {
+		return err
+	}
+
+	routeUtils.ResponseOK(res, w)
+
+	return nil
+}
+
 func (router *Router) AppleLoginMobile(w http.ResponseWriter, r *http.Request) *perror.PlutoError {
 	login := request.AppleMobileLogin{}
 

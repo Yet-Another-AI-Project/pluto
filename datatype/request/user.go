@@ -80,13 +80,6 @@ type WechatMobileLogin struct {
 	AppID string `json:"app_id"`
 }
 
-type WechatWebLoginState struct {
-	// NOTE(cj): 这里的 id 其实是目前的 app.name
-	AppID string `json:"app"`
-
-	RedirectURL string `json:"redirect_url"`
-}
-
 func (wml *WechatMobileLogin) Validation() bool {
 	if wml.Code == "" {
 		return false
@@ -99,6 +92,30 @@ func (wml *WechatMobileLogin) Validation() bool {
 	// set default deviceID
 	if wml.DeviceID == "" {
 		wml.DeviceID = defaultDeviceID
+	}
+
+	return true
+}
+
+type WechatWebLoginState struct {
+	// NOTE(cj): 这里的 id 其实是目前的 app.name
+	AppID string `json:"app"`
+
+	RedirectURL string `json:"redirect_url"`
+}
+
+type WechatMiniprogramLogin struct {
+	Code  string `json:"code"`
+	AppID string `json:"app_id"`
+}
+
+func (wml *WechatMiniprogramLogin) Validation() bool {
+	if wml.Code == "" {
+		return false
+	}
+
+	if wml.AppID == "" {
+		return false
 	}
 
 	return true

@@ -15,9 +15,6 @@ import (
 
 	"github.com/BillSJC/appleLogin"
 	"github.com/lithammer/shortuuid/v4"
-	"github.com/volatiletech/sqlboiler/boil"
-
-	"github.com/volatiletech/sqlboiler/queries/qm"
 
 	"pluto/modelexts"
 
@@ -30,6 +27,9 @@ import (
 
 	gjwt "github.com/dgrijalva/jwt-go"
 	"google.golang.org/api/oauth2/v2"
+
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 const (
@@ -461,6 +461,93 @@ func (m *Manager) WechatLoginWeb(appID, code string) (*GrantResult, *perror.Plut
 	return grantResult, nil
 }
 
+func (m *Manager) WechatLoginMiniprogram(appID, code string) (*GrantResult, *perror.PlutoError) {
+	wechatLogin, perr := getAppWechatLogin(m, appID)
+
+	if perr != nil {
+		return nil, perr
+	}
+
+	sessionKey, unionID, perr := getWechatSessionKey(code, wechatLogin.AppID, wechatLogin.AppSecret)
+	if perr != nil {
+		return nil, perr
+	}
+
+	tx, err := m.db.Begin()
+	if err != nil {
+		return nil, perror.ServerError.Wrapper(err)
+	}
+
+	defer func() {
+		tx.Rollback()
+	}()
+
+	identifyToken := unionID
+	wechatBinding, err := models.Bindings(qm.Where("app_id = ? and login_type = ? and identify_token = ?", appID, WECHATLOGIN, identifyToken)).One(tx)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, perror.ServerError.Wrapper(err)
+	}
+
+	salt := saltUtil.RandomSalt(identifyToken)
+
+	randomPassword := saltUtil.RandomToken(10)
+	encodedPassword, perr := saltUtil.EncodePassword(randomPassword, salt)
+	if perr != nil {
+		return nil, perr
+	}
+
+	namePrefix := "wechat_miniprogram_user"
+
+	name, perr := m.randomUserName(tx, namePrefix)
+
+	if perr != nil {
+		return nil, perr
+	}
+
+	avatarURL, perr := m.genAvatarFromGravatar()
+	if perr != nil {
+		return nil, perr
+	}
+
+	var user *models.User
+	if wechatBinding == nil {
+		_, perr := m.getApplication(tx, appID)
+		if perr != nil {
+			return nil, perr
+		}
+
+		user, perr = m.newUser(tx, name, avatarURL, encodedPassword, nil, true, appID)
+		if perr != nil {
+			return nil, perr
+		}
+		wechatBinding, perr = m.newBinding(tx, user.ID, "", WECHATLOGIN, unionID, true, appID)
+		if perr != nil {
+			return nil, perr
+		}
+	} else {
+		if _, err := wechatBinding.Update(tx, boil.Whitelist("mail")); err != nil {
+			return nil, perror.ServerError.Wrapper(err)
+		}
+		user, err = models.Users(qm.Where("id = ?", wechatBinding.UserID)).One(tx)
+		if err != nil {
+			return nil, perror.ServerError.Wrapper(err)
+		}
+	}
+
+	scopes, perr := getUserDefaultScopes(tx, user.ID, appID)
+	if perr != nil {
+		return nil, perr
+	}
+
+	grantResult, perr := m.loginWithAppNameAndSessionKey(tx, user.ID, "miniprogram", appID, strings.Join(scopes, ","), sessionKey)
+	if perr != nil {
+		return nil, perr
+	}
+
+	tx.Commit()
+	return grantResult, nil
+}
+
 func (m *Manager) WechatLoginMobile(login request.WechatMobileLogin) (*GrantResult, *perror.PlutoError) {
 	wechatLogin, perr := getAppWechatLogin(m, login.AppID)
 
@@ -664,6 +751,64 @@ func getWechatAccessToken(code string, appID string, appSecret string) (accessTo
 	}
 
 	return "", "", perror.ServerError.Wrapper(errors.New("Unknow server error"))
+}
+
+func getWechatSessionKey(code string, appID string, appSecret string) (sessionkey, unionid string, pe *perror.PlutoError) {
+	defer func() {
+		var err error
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("Unknown panic")
+			}
+		}
+		if err != nil {
+			pe = perror.ServerError.Wrapper(err)
+		}
+	}()
+	// get access token
+	url := fmt.Sprintf("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
+		appID, appSecret, code)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", "", perror.ServerError.Wrapper(err)
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", "", perror.ServerError.Wrapper(err)
+	}
+
+	body := struct {
+		SessionKey string `json:"session_key"`
+		Unionid    string `json:"unionid"`
+		Errmsg     string `json:"errmsg"`
+		OpenID     string `json:"openid"`
+		Errcode    int32  `json:"errcode"`
+	}{}
+
+	if err := json.Unmarshal(b, &body); err != nil {
+		return "", "", perror.ServerError.Wrapper(err)
+	}
+
+	if body.Errcode != 0 {
+		// invalid code
+		if body.Errcode == 40029 {
+			return "", "", perror.InvalidWechatCode.Wrapper(errors.New(body.Errmsg))
+		}
+		return "", "", perror.ServerError.Wrapper(errors.New(body.Errmsg))
+	}
+
+	if body.Unionid == "" || body.SessionKey == "" {
+		return "", "", perror.ServerError.Wrapper(errors.New("session_key and unionid can't be empty"))
+	}
+
+	return body.SessionKey, body.Unionid, nil
 }
 
 type wechatUserInfo struct {

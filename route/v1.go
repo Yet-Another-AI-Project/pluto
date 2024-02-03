@@ -58,6 +58,13 @@ func (r *Router) registerUserV1Routes(prefix string) {
 			handler:     r.v1.WechatLoginMobile,
 		},
 		{
+			path:        "/login/wechat/miniprogram",
+			description: "Login with wechat account for miniprogram app",
+			method:      "POST",
+			middle:      middleware.NoAuthMiddleware,
+			handler:     r.v1.WechatLoginMiniprogram,
+		},
+		{
 			path:        "/binding",
 			description: "Bind mail, google, wechat, apple account",
 			method:      "POST",

@@ -87,6 +87,10 @@ var migrations = []Migrations{
 		name:     "modify_app_id_constrain_for_user_table",
 		function: modifyAppIDConstrainForUserTable,
 	},
+	{
+		name:     "add_session_key_column_in_refresh_tokens_table",
+		function: addSessionKeyColumnInRefreshTokensTable,
+	},
 }
 
 func createUsersTable(db *sql.DB, name string) error {
@@ -447,6 +451,17 @@ func modifyAppIDConstrainForUserTable(db *sql.DB, name string) error {
 		drop index user_id_UNIQUE,
 		add unique index app_id_user_id_unique (app_id, user_id);
 	`
+	_, err := db.Exec(sql)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func addSessionKeyColumnInRefreshTokensTable(db *sql.DB, name string) error {
+	sql := "ALTER TABLE `refresh_tokens` add column `session_key` varchar(100) not null default ''"
+
 	_, err := db.Exec(sql)
 	if err != nil {
 		return err

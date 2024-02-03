@@ -17,9 +17,10 @@ import (
 	saltUtil "pluto/utils/salt"
 
 	"github.com/RichardKnop/uuid"
-	"github.com/volatiletech/sqlboiler/boil"
-	"github.com/volatiletech/sqlboiler/queries/qm"
 	"github.com/wxnacy/wgo/arrays"
+
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 const (
@@ -32,6 +33,7 @@ type GrantResult struct {
 	RefreshToken         string `json:"refresh_token"`
 	RefreshTokenExpireAt int64  `json:"refresh_token_expire_at"`
 	AccessToken          string `json:"access_token"`
+	AccessTokenExpireAt  int64  `json:"access_token_expire_at"`
 	Type                 string `json:"type"`
 }
 
@@ -330,6 +332,30 @@ func (m *Manager) authPassword(exec boil.Executor, mail, password string) (*mode
 	return user, nil
 }
 
+func (m *Manager) loginWithAppNameAndSessionKey(exec boil.Executor, userID uint, deviceID, appName string, scopes string, sessionKey string) (*GrantResult, *perror.PlutoError) {
+
+	application, perr := m.getApplication(exec, appName)
+	if perr != nil {
+		return nil, perr
+	}
+
+	// insert deviceID and appID into device table
+	deviceApp, perr := m.getDeviceApp(exec, deviceID, application)
+	if perr != nil {
+		return nil, perr
+	}
+
+	// create refresh token
+	refreshToken, perr := m.newRefreshTokenWithSessionKey(exec, userID, deviceApp, scopes, sessionKey)
+
+	if perr != nil {
+		return nil, perr
+	}
+
+	// grant access token
+	return m.grantToken(userID, refreshToken, scopes, application.Name, m.config.Token.AccessTokenExpire)
+}
+
 func (m *Manager) loginWithAppName(exec boil.Executor, userID uint, deviceID, appName string, scopes string) (*GrantResult, *perror.PlutoError) {
 
 	application, perr := m.getApplication(exec, appName)
@@ -397,6 +423,23 @@ func (m *Manager) newRefreshToken(exec boil.Executor, userID uint, deviceApp *mo
 	return rt, nil
 }
 
+func (m *Manager) newRefreshTokenWithSessionKey(exec boil.Executor, userID uint, deviceApp *models.DeviceApp, scopes string, sessionKey string) (*models.RefreshToken, *perror.PlutoError) {
+	refreshToken := refresh.GenerateRefreshToken(string(rune(userID)) + string(rune(deviceApp.ID)))
+
+	rt := &models.RefreshToken{}
+	rt.DeviceAppID = deviceApp.ID
+	rt.UserID = userID
+	rt.RefreshToken = refreshToken
+	rt.ExpireAt = time.Now().Add(time.Duration(m.config.Token.RefreshTokenExpire) * time.Second)
+	rt.SessionKey = sessionKey
+	rt.Scopes.SetValid(scopes)
+	if err := rt.Insert(exec, boil.Infer()); err != nil {
+		return nil, perror.ServerError.Wrapper(err)
+	}
+
+	return rt, nil
+}
+
 func (m *Manager) updateRefreshToken(exec boil.Executor, rt *models.RefreshToken, scopes string) *perror.PlutoError {
 	// NOTE(cj): 这里同 newRefreshToken
 	newToken := refresh.GenerateRefreshToken(string(rune(rt.UserID)) + string(rune(rt.DeviceAppID)))
@@ -438,8 +481,9 @@ func (m *Manager) grantToken(userID uint, rt *models.RefreshToken, scopes, appID
 	}
 
 	grantResult := &GrantResult{
-		Type:        "Bearer",
-		AccessToken: accessToken.String(),
+		Type:                "Bearer",
+		AccessToken:         accessToken.String(),
+		AccessTokenExpireAt: up.Expire,
 	}
 
 	if rt != nil {

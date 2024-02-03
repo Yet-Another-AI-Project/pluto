@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/volatiletech/sqlboiler/boil"
 	"github.com/wxnacy/wgo/arrays"
 
 	"pluto/config"
@@ -14,7 +13,8 @@ import (
 	"pluto/modelexts"
 	"pluto/models"
 
-	"github.com/volatiletech/sqlboiler/queries/qm"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 func getUserRole(exec boil.Executor, userID uint, appID string) (*models.RbacRole, *perror.PlutoError) {
