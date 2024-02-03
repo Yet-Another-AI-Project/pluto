@@ -9,6 +9,7 @@ Pluto provides a set of HTTP resetful APIs.
     - [/v1/user/login/google/mobile](#v1userlogingooglemobile)
     - [/v1/user/login/apple/mobile](#v1userloginapplemobile)
     - [/v1/user/login/wechat/mobile](#v1userloginwechatmobile)
+    - [/v1/user/login/wechat/miniprogram](#v1userloginwechatminiprogram)
     - [/v1/user/password/reset/mail](#v1userpasswordresetmail)
     - [/v1/user/binding](#v1userbinding)
     - [/v1/user/unbinding](#v1userunbinding)
@@ -180,6 +181,34 @@ Code is the token for verifying the register and getting the user's info like id
 Login with wechat account for mobile app
 
 Offical docs [wechat](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/WeChat_Login/Development_Guide.html).
+
+* method: POST
+
+* request:
+
+```
+{"code":<string>, "device_id":<string|optional>, "app_id":<string>}
+```
+
+Code is the token for exchanging the access token of wechat
+
+* response example:
+```
+{
+  "status": "ok",
+  "body": {
+    "refresh_token": "",
+    "access_token": "",
+    "type": "Bearer"
+  }
+}
+```
+
+### /v1/user/login/wechat/miniprogram
+
+Login with wechat account for miniprogram app
+
+Offical docs [wechat](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html).
 
 * method: POST
 
