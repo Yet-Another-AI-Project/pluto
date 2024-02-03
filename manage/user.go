@@ -647,19 +647,20 @@ func getWechatAccessToken(code string, appID string, appSecret string) (accessTo
 		return "", "", perror.ServerError.Wrapper(err)
 	}
 
-	if resp.StatusCode == http.StatusOK {
-		if !strings.Contains(body["scope"].(string), "snsapi_userinfo") {
-			return "", "", perror.ServerError.Wrapper(errors.New("Not contain a userinfo scope"))
-		}
-		return body["access_token"].(string), body["openid"].(string), nil
-	}
-
 	if errcode, ok := body["errcode"]; ok {
 		// invalid code
 		if int(errcode.(float64)) == 40029 {
 			return "", "", perror.InvalidWechatCode
 		}
 		return "", "", perror.ServerError.Wrapper(errors.New(body["errmsg"].(string)))
+	}
+
+	if scope, ok := body["scope"]; ok {
+		if !strings.Contains(scope.(string), "snsapi_userinfo") {
+			return "", "", perror.ServerError.Wrapper(errors.New("Not contain a userinfo scope"))
+		}
+
+		return body["access_token"].(string), body["openid"].(string), nil
 	}
 
 	return "", "", perror.ServerError.Wrapper(errors.New("Unknow server error"))
