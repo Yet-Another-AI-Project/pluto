@@ -63,6 +63,11 @@ func register(router *route.Router, db *sql.DB, config *config.Config, bundle *i
 	return nil
 }
 
+// @title Pluto API
+// @Version 0.0.1
+// @description Client-side API intended for general users.
+//
+// @Contact.Name API Support
 func main() {
 	_ = pp.Println // prevent warning
 

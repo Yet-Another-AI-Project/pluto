@@ -188,7 +188,7 @@ func (rp *ResetPasswordWeb) Validation() bool {
 type UpdateUserInfo struct {
 	Name   string `json:"name"`
 	Avatar string `json:"avatar"`
-	UserID string `json:"user_id"`
+	UserID string `json:"-"`
 }
 
 func (uui *UpdateUserInfo) Validation() bool {

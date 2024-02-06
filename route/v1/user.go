@@ -108,6 +108,16 @@ func (router *Router) WechatLoginMobile(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+// WechatLoginMiniprogram godoc
+// @Summary Wehcat miniprogram login
+// @Tags User
+// @Description Wehcat miniprogram login
+// @Accept  json
+// @Produce  json
+// @Param request body request.WechatMiniprogramLogin true "Wechat miniprogram login request"
+// @Success 200 {object} response.Reponse{body=manage.GrantResult}
+//
+// @Router /v1/user/login/wechat/miniprogram [post]
 func (router *Router) WechatLoginMiniprogram(w http.ResponseWriter, r *http.Request) *perror.PlutoError {
 	login := request.WechatMiniprogramLogin{}
 
@@ -272,6 +282,16 @@ func (router *Router) PasswordResetMail(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+// GetUserInfo godoc
+// @Summary Get user info
+// @Tags User
+// @Description Get user info
+// @Accept  json
+// @Produce  json
+// @Param Authorization header string true "Bearer <token>"
+// @Success 200 {object} response.Reponse{body=modelexts.UserInfo}
+//
+// @Router /v1/user/info [get]
 func (router *Router) UserInfo(w http.ResponseWriter, r *http.Request) *perror.PlutoError {
 	payload, perr := routeUtils.GetAccessPayload(r)
 	if perr != nil {
@@ -284,11 +304,22 @@ func (router *Router) UserInfo(w http.ResponseWriter, r *http.Request) *perror.P
 		return perr
 	}
 
-	routeUtils.ResponseOK(res.Format(), w)
+	routeUtils.ResponseOK(res.UserInfo(), w)
 
 	return nil
 }
 
+// UpdateUserInfo godoc
+// @Summary Update user info
+// @Tags User
+// @Description Update user info
+// @Accept  json
+// @Produce  json
+// @Param Authorization header string true "Bearer <token>"
+// @Param request body request.UpdateUserInfo true "update user info"
+// @Success 200 {object} response.Reponse{}
+//
+// @Router /v1/user/info [put]
 func (router *Router) UpdateUserInfo(w http.ResponseWriter, r *http.Request) *perror.PlutoError {
 	payload, perr := routeUtils.GetAccessPayload(r)
 	if perr != nil {

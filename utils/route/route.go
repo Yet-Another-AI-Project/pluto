@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"runtime/debug"
@@ -48,7 +48,7 @@ func GetRequestData(r *http.Request, receiver interface{}) *perror.PlutoError {
 
 	contentType := r.Header.Get("Content-type")
 	if strings.Contains(contentType, "application/json") {
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			return perror.ServerError.Wrapper(errors.New("Read body failed: " + err.Error()))
 		}
@@ -106,7 +106,7 @@ func GetAccessPayload(r *http.Request) (*jwt.AccessPayload, *perror.PlutoError) 
 }
 
 func ResponseOK(body interface{}, w http.ResponseWriter) *perror.PlutoError {
-	response := resp.ReponseOK{}
+	response := resp.Reponse{}
 	response.Status = resp.STATUSOK
 	response.Body = body
 	w.Header().Set("Content-type", "application/json")
@@ -123,15 +123,12 @@ func ResponseOK(body interface{}, w http.ResponseWriter) *perror.PlutoError {
 }
 
 func ResponseError(plutoError *perror.PlutoError, w http.ResponseWriter) *perror.PlutoError {
-	response := resp.ReponseError{}
+	response := resp.Reponse{}
 	response.Status = resp.STATUSERROR
 	w.Header().Set("Content-type", "application/json")
 	w.WriteHeader(plutoError.HTTPCode)
 
-	m := make(map[string]interface{})
-	m["code"] = plutoError.PlutoCode
-	m["message"] = plutoError.HTTPError.Error()
-	response.Error = m
+	response.Error = plutoError
 	b, err := json.Marshal(response)
 	if err != nil {
 		return perror.HTTPResponseError.Wrapper(err)

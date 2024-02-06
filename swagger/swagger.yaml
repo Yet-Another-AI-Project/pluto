@@ -1,0 +1,248 @@
+definitions:
+  jwt.AccessPayload:
+    properties:
+      exp:
+        type: integer
+      iat:
+        type: integer
+      iss:
+        type: string
+      scopes:
+        items:
+          type: string
+        type: array
+      sub:
+        type: integer
+      type:
+        type: string
+    type: object
+  manage.GrantResult:
+    properties:
+      access_token:
+        type: string
+      access_token_expire_at:
+        type: integer
+      refresh_token:
+        type: string
+      refresh_token_expire_at:
+        type: integer
+      type:
+        type: string
+    type: object
+  modelexts.UserInfo:
+    properties:
+      avatar:
+        type: string
+      name:
+        type: string
+      sub:
+        type: integer
+    type: object
+  pluto_error.PlutoError:
+    properties:
+      code:
+        type: integer
+      message: {}
+    type: object
+  request.RefreshAccessToken:
+    properties:
+      app_id:
+        type: string
+      refresh_token:
+        type: string
+      scopes:
+        type: string
+    type: object
+  request.UpdateUserInfo:
+    properties:
+      avatar:
+        type: string
+      name:
+        type: string
+    type: object
+  request.VerifyAccessToken:
+    properties:
+      token:
+        type: string
+    type: object
+  request.WechatMiniprogramLogin:
+    properties:
+      app_id:
+        type: string
+      code:
+        type: string
+    type: object
+  response.Reponse:
+    properties:
+      body: {}
+      error:
+        $ref: '#/definitions/pluto_error.PlutoError'
+      status:
+        type: string
+    type: object
+  v1.PublicKeyResponse:
+    properties:
+      public_key:
+        type: string
+    type: object
+info:
+  contact:
+    name: API Support
+  description: Client-side API intended for general users.
+  title: Pluto API
+  version: 0.0.1
+paths:
+  /v1/token/access/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify access token
+      parameters:
+      - description: Verify access token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.VerifyAccessToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Reponse'
+            - properties:
+                body:
+                  $ref: '#/definitions/jwt.AccessPayload'
+              type: object
+      summary: Verify access token
+      tags:
+      - Token
+  /v1/token/publickey:
+    get:
+      consumes:
+      - application/json
+      description: Get public key
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Reponse'
+            - properties:
+                body:
+                  $ref: '#/definitions/v1.PublicKeyResponse'
+              type: object
+      summary: Get public key
+      tags:
+      - Token
+  /v1/token/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refresh access token
+      parameters:
+      - description: Refresh access token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RefreshAccessToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Reponse'
+            - properties:
+                body:
+                  $ref: '#/definitions/manage.GrantResult'
+              type: object
+      summary: Refresh access token
+      tags:
+      - Token
+  /v1/user/info:
+    get:
+      consumes:
+      - application/json
+      description: Get user info
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Reponse'
+            - properties:
+                body:
+                  $ref: '#/definitions/modelexts.UserInfo'
+              type: object
+      summary: Get user info
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update user info
+      parameters:
+      - description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: update user info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUserInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Reponse'
+      summary: Update user info
+      tags:
+      - User
+  /v1/user/login/wechat/miniprogram:
+    post:
+      consumes:
+      - application/json
+      description: Wehcat miniprogram login
+      parameters:
+      - description: Wechat miniprogram login request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WechatMiniprogramLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Reponse'
+            - properties:
+                body:
+                  $ref: '#/definitions/manage.GrantResult'
+              type: object
+      summary: Wehcat miniprogram login
+      tags:
+      - User
+swagger: "2.0"

@@ -43,3 +43,6 @@ test: unit-test
 ci-build-production: test docker-build docker-push docker-clean
 
 ci-build-staging: test docker-build-staging docker-push-staging docker-clean-staging
+
+generate-api-swagger:
+	swag init -g cmd/pluto-server/main.go --output ./swagger

@@ -14,6 +14,20 @@ type User struct {
 	PasswordSet bool
 }
 
+type UserInfo struct {
+	Sub    uint   `json:"sub"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
+}
+
+func (u User) UserInfo() UserInfo {
+	return UserInfo{
+		Sub:    u.User.ID,
+		Name:   u.User.Name,
+		Avatar: u.User.Avatar.String,
+	}
+}
+
 func (u User) Format() map[string]interface{} {
 	res := make(map[string]interface{})
 	res["sub"] = u.User.ID

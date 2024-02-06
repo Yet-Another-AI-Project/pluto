@@ -6,10 +6,10 @@ import (
 )
 
 type PlutoError struct {
-	HTTPCode  int
-	HTTPError error
-	PlutoCode int
-	LogError  error
+	HTTPCode  int   `json:"-" swaggerignore:"true"`
+	HTTPError error `json:"message"`
+	PlutoCode int   `json:"code"`
+	LogError  error `json:"-" swaggerignore:"true"`
 }
 
 func (pe PlutoError) Wrapper(err error) *PlutoError {

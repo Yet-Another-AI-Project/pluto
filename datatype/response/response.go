@@ -1,16 +1,14 @@
-package datatype
+package response
+
+import "pluto/datatype/pluto_error"
 
 const (
 	STATUSOK    = "ok"
 	STATUSERROR = "error"
 )
 
-type ReponseOK struct {
-	Status string      `json:"status"`
-	Body   interface{} `json:"body"`
-}
-
-type ReponseError struct {
-	Status string      `json:"status"`
-	Error  interface{} `json:"error"`
+type Reponse struct {
+	Status string                  `json:"status" swaggertype:"string" enum:"ok, error"`
+	Error  *pluto_error.PlutoError `json:"error"`
+	Body   interface{}             `json:"body"`
 }
