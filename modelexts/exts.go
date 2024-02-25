@@ -15,17 +15,52 @@ type User struct {
 }
 
 type UserInfo struct {
-	Sub    uint   `json:"sub"`
-	Name   string `json:"name"`
-	Avatar string `json:"avatar"`
+	Sub           uint       `json:"sub"`
+	UserID        string     `json:"user_id"`
+	UserUpdated   bool       `json:"user_updated"`
+	Name          string     `json:"name"`
+	Role          string     `json:"role"`
+	AppID         string     `json:"app_id"`
+	Avatar        string     `json:"avatar"`
+	Verified      bool       `json:"verified"`
+	CreatedAt     int64      `json:"created_at"`
+	UpdatedAt     int64      `json:"update_at"`
+	IsPasswordSet bool       `json:"is_password_set"`
+	Bindings      []*Binding `json:"bindings"`
+}
+
+type Binding struct {
+	LoginType string `json:"login_type"`
+	Mail      string `json:"mail"`
 }
 
 func (u User) UserInfo() UserInfo {
-	return UserInfo{
-		Sub:    u.User.ID,
-		Name:   u.User.Name,
-		Avatar: u.User.Avatar.String,
+	userInfo := UserInfo{
+		Sub:           u.User.ID,
+		UserID:        u.User.UserID,
+		UserUpdated:   u.User.UserIDUpdated,
+		Name:          u.User.Name,
+		Avatar:        u.User.Avatar.String,
+		Role:          u.Role,
+		AppID:         u.AppID,
+		Verified:      u.User.Verified.Bool,
+		CreatedAt:     u.User.CreatedAt.Time.Unix(),
+		UpdatedAt:     u.User.UpdatedAt.Time.Unix(),
+		IsPasswordSet: u.PasswordSet,
 	}
+
+	bindings := make([]*Binding, 0)
+
+	for _, binding := range u.Bindings {
+		b := &Binding{}
+		b.LoginType = binding.LoginType
+		b.Mail = binding.Mail
+		bindings = append(bindings, b)
+	}
+
+	userInfo.Bindings = bindings
+
+	return userInfo
 }
 
 func (u User) Format() map[string]interface{} {
