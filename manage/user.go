@@ -42,7 +42,7 @@ const (
 
 func (m *Manager) randomUserName(exec boil.Executor, prefix string) (string, *perror.PlutoError) {
 	randomTokenLen := 5
-	name := prefix
+	name := fmt.Sprintf("%s_%s", prefix, saltUtil.RandomToken(randomTokenLen))
 
 	for {
 		exists, err := models.Users(qm.Where("name = ?", name)).Exists(exec)
@@ -496,7 +496,7 @@ func (m *Manager) WechatLoginMiniprogram(appID, code string) (*GrantResult, *per
 		return nil, perr
 	}
 
-	namePrefix := "wechat_miniprogram_user"
+	namePrefix := "user"
 
 	name, perr := m.randomUserName(tx, namePrefix)
 
