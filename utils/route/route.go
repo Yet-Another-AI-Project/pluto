@@ -26,19 +26,13 @@ import (
 )
 
 func GetBaseURL(r *http.Request) string {
-	scheme := "http"
-	if r.TLS != nil {
-		scheme = "https"
-	}
-
-	baseURL := fmt.Sprintf("%s://%s", scheme, r.Host)
-
 	// forwarded host
 	forwardedHost := r.Header.Get("X-Forwarded-Host")
 	if forwardedHost != "" {
-		baseURL = forwardedHost
+		return forwardedHost
 	}
-	return baseURL
+
+	return r.Host
 }
 
 func GetRequestData(r *http.Request, receiver interface{}) *perror.PlutoError {
