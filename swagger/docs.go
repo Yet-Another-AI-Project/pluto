@@ -321,17 +321,58 @@ const docTemplate = `{
                 }
             }
         },
+        "modelexts.Binding": {
+            "type": "object",
+            "properties": {
+                "login_type": {
+                    "type": "string"
+                },
+                "mail": {
+                    "type": "string"
+                }
+            }
+        },
         "modelexts.UserInfo": {
             "type": "object",
             "properties": {
+                "app_id": {
+                    "type": "string"
+                },
                 "avatar": {
                     "type": "string"
+                },
+                "bindings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/modelexts.Binding"
+                    }
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "is_password_set": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
                 },
+                "role": {
+                    "type": "string"
+                },
                 "sub": {
                     "type": "integer"
+                },
+                "update_at": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_updated": {
+                    "type": "boolean"
+                },
+                "verified": {
+                    "type": "boolean"
                 }
             }
         },
