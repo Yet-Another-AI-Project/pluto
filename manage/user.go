@@ -417,15 +417,15 @@ func (m *Manager) WechatLoginWeb(appID, code string) (*GrantResult, *perror.Plut
 		return nil, perr
 	}
 
-	avatarURL, perr := m.genAvatarFromGravatar()
-	if perr != nil {
-		return nil, perr
-	}
-
 	var user *models.User
 	if wechatBinding == nil {
-		_, perr := m.getApplication(tx, appID)
+
+		avatarURL, perr := m.genAvatarFromGravatar(appID)
 		if perr != nil {
+			return nil, perr
+		}
+
+		if _, perr := m.getApplication(tx, appID); perr != nil {
 			return nil, perr
 		}
 
@@ -504,15 +504,15 @@ func (m *Manager) WechatLoginMiniprogram(appID, code string) (*GrantResult, *per
 		return nil, perr
 	}
 
-	avatarURL, perr := m.genAvatarFromGravatar()
-	if perr != nil {
-		return nil, perr
-	}
-
 	var user *models.User
 	if wechatBinding == nil {
-		_, perr := m.getApplication(tx, appID)
+
+		avatarURL, perr := m.genAvatarFromGravatar(appID)
 		if perr != nil {
+			return nil, perr
+		}
+
+		if _, perr := m.getApplication(tx, appID); perr != nil {
 			return nil, perr
 		}
 
@@ -899,22 +899,6 @@ func (m *Manager) AppleLoginMobile(login request.AppleMobileLogin) (*GrantResult
 		tx.Rollback()
 	}()
 
-	ag := avatar.AvatarGen{}
-	avatarReader, perr := ag.GenFromGravatar()
-	if perr != nil {
-		return nil, perr
-	}
-
-	avatarURL := ""
-	as := avatar.NewAvatarSaver(m.config)
-	remoteURL, perr := as.SaveAvatarImageInOSS(avatarReader)
-	if perr != nil {
-		avatarURL = avatarReader.OriginURL
-		m.logger.Warn(perr.LogError)
-	} else {
-		avatarURL = remoteURL
-	}
-
 	identifyToken := info.Sub
 	appleBinding, err := models.Bindings(qm.Where("app_id = ? and login_type = ? and identify_token = ?", login.AppID, APPLELOGIN, info.Sub)).One(tx)
 	if err != nil && err != sql.ErrNoRows {
@@ -937,8 +921,12 @@ func (m *Manager) AppleLoginMobile(login request.AppleMobileLogin) (*GrantResult
 
 	var user *models.User
 	if appleBinding == nil {
-		_, perr := m.getApplication(tx, login.AppID)
+		avatarURL, perr := m.genAvatarFromGravatar(login.AppID)
 		if perr != nil {
+			return nil, perr
+		}
+
+		if _, perr := m.getApplication(tx, login.AppID); perr != nil {
 			return nil, perr
 		}
 
@@ -1270,8 +1258,12 @@ func (m *Manager) isValidURL(toTest string) bool {
 	return err == nil && u.Scheme != "" && u.Host != ""
 }
 
-func (m *Manager) genAvatarFromGravatar() (string, *perror.PlutoError) {
+func (m *Manager) genAvatarFromGravatar(appid string) (string, *perror.PlutoError) {
 	avatarURL := ""
+
+	if appid == "kiwi" {
+		return "https://pluto-cdn.kiwiworlds.com/avatar/kiwi.jpg", nil
+	}
 
 	// skip this step in local dev
 	if m.config.Misc.Env != "dev" {
@@ -1342,7 +1334,7 @@ func (m *Manager) RegisterWithEmail(register request.MailRegister, admin bool) (
 		return nil, perr
 	}
 
-	avatarURL, perr := m.genAvatarFromGravatar()
+	avatarURL, perr := m.genAvatarFromGravatar(register.AppName)
 	if perr != nil {
 		return nil, perr
 	}
