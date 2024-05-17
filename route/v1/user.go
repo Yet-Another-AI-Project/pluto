@@ -42,6 +42,16 @@ func (router *Router) Login(w http.ResponseWriter, r *http.Request) *perror.Plut
 	return nil
 }
 
+// GoogleLoginMobile godoc
+// @Summary google login
+// @Tags User
+// @Description google login
+// @Accept  json
+// @Produce  json
+// @Param request body request.GoogleMobileLogin true "Google login request"
+// @Success 200 {object} response.Reponse{body=manage.GrantResult}
+//
+// @Router /v1/user/login/google/mobile [post]
 func (router *Router) GoogleLoginMobile(w http.ResponseWriter, r *http.Request) *perror.PlutoError {
 	login := request.GoogleMobileLogin{}
 

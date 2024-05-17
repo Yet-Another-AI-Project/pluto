@@ -1,6 +1,7 @@
 package manage
 
 import (
+	"context"
 	"database/sql"
 	b64 "encoding/base64"
 	"encoding/json"
@@ -27,6 +28,7 @@ import (
 
 	gjwt "github.com/dgrijalva/jwt-go"
 	"google.golang.org/api/oauth2/v2"
+	"google.golang.org/api/option"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -351,7 +353,12 @@ type googleIDTokenInfo struct {
 
 func verifyGoogleIdToken(idToken string) (*googleIDTokenInfo, *perror.PlutoError) {
 	var httpClient = &http.Client{}
-	oauth2Service, err := oauth2.New(httpClient)
+	oauth2Service, err := oauth2.NewService(context.Background(), option.WithHTTPClient(httpClient))
+
+	if err != nil {
+		return nil, perror.InvalidGoogleIDToken.Wrapper(err)
+	}
+
 	tokenInfoCall := oauth2Service.Tokeninfo()
 	tokenInfoCall.IdToken(idToken)
 	tokenInfo, err := tokenInfoCall.Do()
