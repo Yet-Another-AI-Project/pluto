@@ -6,10 +6,10 @@ import (
 )
 
 type PlutoError struct {
-	HTTPCode  int   `json:"-" swaggerignore:"true"`
-	HTTPError error `json:"message"`
-	PlutoCode int   `json:"code"`
-	LogError  error `json:"-" swaggerignore:"true"`
+	HTTPCode  int    `json:"-" swaggerignore:"true"`
+	HTTPError string `json:"message"`
+	PlutoCode int    `json:"code"`
+	LogError  error  `json:"-" swaggerignore:"true"`
 }
 
 func (pe PlutoError) Wrapper(err error) *PlutoError {
@@ -26,7 +26,7 @@ func NewPlutoError(httpCode int, plutoCode int, httpError string, logError error
 	}
 	return &PlutoError{
 		HTTPCode:  httpCode,
-		HTTPError: errors.New(httpError),
+		HTTPError: httpError,
 		PlutoCode: plutoCode,
 		LogError:  logError,
 	}

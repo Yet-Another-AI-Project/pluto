@@ -251,7 +251,7 @@ func PlutoLog(logger *log.PlutoLog, pe *perror.PlutoError, r *http.Request) {
 			fmt.Println(string(debug.Stack()))
 		}
 	}
-	if pe.HTTPError != nil {
-		logger.Debug(fmt.Sprintf("[(%s)%s]:%s", r.Method, url, pe.HTTPError.Error()))
+	if pe.HTTPError != "" {
+		logger.Debug(fmt.Sprintf("[(%s)%s]:%s", r.Method, url, pe.HTTPError))
 	}
 }

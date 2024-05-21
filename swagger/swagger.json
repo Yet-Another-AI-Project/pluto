@@ -219,6 +219,52 @@
                 }
             }
         },
+        "/v1/user/login/google/mobile": {
+            "post": {
+                "description": "google login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "google login",
+                "parameters": [
+                    {
+                        "description": "Google login request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.GoogleMobileLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Reponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "body": {
+                                            "$ref": "#/definitions/manage.GrantResult"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/v1/user/login/wechat/miniprogram": {
             "post": {
                 "description": "Wehcat miniprogram login",
@@ -375,6 +421,20 @@
                     "type": "integer"
                 },
                 "message": {}
+            }
+        },
+        "request.GoogleMobileLogin": {
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "string"
+                },
+                "id_token": {
+                    "type": "string"
+                }
             }
         },
         "request.RefreshAccessToken": {
