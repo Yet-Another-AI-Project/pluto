@@ -227,9 +227,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/user/login/google/mobile": {
+        "/v1/user/login/google/web": {
             "post": {
-                "description": "google login",
+                "description": "google login web",
                 "consumes": [
                     "application/json"
                 ],
@@ -239,15 +239,15 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "google login",
+                "summary": "google login web",
                 "parameters": [
                     {
-                        "description": "Google login request",
+                        "description": "Google login web request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.GoogleMobileLogin"
+                            "$ref": "#/definitions/request.GoogleWebLogin"
                         }
                     }
                 ],
@@ -428,19 +428,21 @@ const docTemplate = `{
                 "code": {
                     "type": "integer"
                 },
-                "message": {}
+                "message": {
+                    "type": "string"
+                }
             }
         },
-        "request.GoogleMobileLogin": {
+        "request.GoogleWebLogin": {
             "type": "object",
             "properties": {
+                "access_token": {
+                    "type": "string"
+                },
                 "app_id": {
                     "type": "string"
                 },
                 "device_id": {
-                    "type": "string"
-                },
-                "id_token": {
                     "type": "string"
                 }
             }

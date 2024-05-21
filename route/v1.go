@@ -37,6 +37,13 @@ func (r *Router) registerUserV1Routes(prefix string) {
 			handler:     r.v1.GoogleLoginMobile,
 		},
 		{
+			path:        "/login/google/web",
+			description: "Login with google account for web app",
+			method:      "POST",
+			middle:      middleware.NoAuthMiddleware,
+			handler:     r.v1.GoogleLoginWeb,
+		},
+		{
 			path:        "/login/apple/mobile",
 			description: "Login with apple account for mobile app",
 			method:      "POST",

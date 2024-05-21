@@ -42,16 +42,6 @@ func (router *Router) Login(w http.ResponseWriter, r *http.Request) *perror.Plut
 	return nil
 }
 
-// GoogleLoginMobile godoc
-// @Summary google login
-// @Tags User
-// @Description google login
-// @Accept  json
-// @Produce  json
-// @Param request body request.GoogleMobileLogin true "Google login request"
-// @Success 200 {object} response.Reponse{body=manage.GrantResult}
-//
-// @Router /v1/user/login/google/mobile [post]
 func (router *Router) GoogleLoginMobile(w http.ResponseWriter, r *http.Request) *perror.PlutoError {
 	login := request.GoogleMobileLogin{}
 
@@ -60,6 +50,34 @@ func (router *Router) GoogleLoginMobile(w http.ResponseWriter, r *http.Request) 
 	}
 
 	res, err := router.manager.GoogleLoginMobile(login)
+
+	if err != nil {
+		return err
+	}
+
+	routeUtils.ResponseOK(res, w)
+
+	return nil
+}
+
+// GoogleLoginWeb godoc
+// @Summary google login web
+// @Tags User
+// @Description google login web
+// @Accept  json
+// @Produce  json
+// @Param request body request.GoogleWebLogin true "Google login web request"
+// @Success 200 {object} response.Reponse{body=manage.GrantResult}
+//
+// @Router /v1/user/login/google/web [post]
+func (router *Router) GoogleLoginWeb(w http.ResponseWriter, r *http.Request) *perror.PlutoError {
+	login := request.GoogleWebLogin{}
+
+	if err := routeUtils.GetRequestData(r, &login); err != nil {
+		return err
+	}
+
+	res, err := router.manager.GoogleLoginWeb(login)
 
 	if err != nil {
 		return err

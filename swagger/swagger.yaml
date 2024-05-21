@@ -69,15 +69,16 @@ definitions:
     properties:
       code:
         type: integer
-      message: {}
+      message:
+        type: string
     type: object
-  request.GoogleMobileLogin:
+  request.GoogleWebLogin:
     properties:
+      access_token:
+        type: string
       app_id:
         type: string
       device_id:
-        type: string
-      id_token:
         type: string
     type: object
   request.RefreshAccessToken:
@@ -254,18 +255,18 @@ paths:
       summary: Update user info
       tags:
       - User
-  /v1/user/login/google/mobile:
+  /v1/user/login/google/web:
     post:
       consumes:
       - application/json
-      description: google login
+      description: google login web
       parameters:
-      - description: Google login request
+      - description: Google login web request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/request.GoogleMobileLogin'
+          $ref: '#/definitions/request.GoogleWebLogin'
       produces:
       - application/json
       responses:
@@ -278,7 +279,7 @@ paths:
                 body:
                   $ref: '#/definitions/manage.GrantResult'
               type: object
-      summary: google login
+      summary: google login web
       tags:
       - User
   /v1/user/login/wechat/miniprogram:

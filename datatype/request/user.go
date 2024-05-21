@@ -72,6 +72,29 @@ func (gml *GoogleMobileLogin) Validation() bool {
 	return true
 }
 
+type GoogleWebLogin struct {
+	AccessToken string `json:"access_token"`
+	DeviceID    string `json:"device_id"`
+	AppID       string `json:"app_id"`
+}
+
+func (gwl *GoogleWebLogin) Validation() bool {
+	if gwl.AccessToken == "" {
+		return false
+	}
+
+	if gwl.AppID == "" {
+		return false
+	}
+
+	// set default deviceID
+	if gwl.DeviceID == "" {
+		gwl.DeviceID = defaultDeviceID
+	}
+
+	return true
+}
+
 type WechatMobileLogin struct {
 	Code     string `json:"code"`
 	DeviceID string `json:"device_id"`

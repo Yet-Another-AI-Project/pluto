@@ -16,6 +16,8 @@ import (
 
 	"github.com/BillSJC/appleLogin"
 	"github.com/lithammer/shortuuid/v4"
+	"google.golang.org/api/oauth2/v2"
+	"google.golang.org/api/option"
 
 	"pluto/modelexts"
 
@@ -27,8 +29,6 @@ import (
 	saltUtil "pluto/utils/salt"
 
 	gjwt "github.com/dgrijalva/jwt-go"
-	"google.golang.org/api/oauth2/v2"
-	"google.golang.org/api/option"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -246,7 +246,7 @@ func (m *Manager) newBinding(exec boil.Executor, userID uint, mail, loginType, i
 }
 
 func (m *Manager) GoogleLoginMobile(login request.GoogleMobileLogin) (*GrantResult, *perror.PlutoError) {
-	info, perr := verifyGoogleIdToken(login.IDToken)
+	info, perr := verifyByGoogleIdToken(login.IDToken)
 	if perr != nil {
 		return nil, perr
 	}
@@ -328,6 +328,89 @@ func (m *Manager) GoogleLoginMobile(login request.GoogleMobileLogin) (*GrantResu
 	return grantResult, nil
 }
 
+func (m *Manager) GoogleLoginWeb(login request.GoogleWebLogin) (*GrantResult, *perror.PlutoError) {
+	info, perr := verifyByGoogleAccessToken(login.AccessToken)
+	if perr != nil {
+		return nil, perr
+	}
+
+	tx, err := m.db.Begin()
+	if err != nil {
+		return nil, perror.ServerError.Wrapper(err)
+	}
+
+	defer func() {
+		tx.Rollback()
+	}()
+
+	googleBinding, err := models.Bindings(qm.Where("app_id = ? and login_type = ? and identify_token = ?", login.AppID, GOOGLELOGIN, info.Id)).One(tx)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, perror.ServerError.Wrapper(err)
+	}
+
+	salt := saltUtil.RandomSalt(info.Id)
+
+	randomPassword := saltUtil.RandomToken(10)
+	encodedPassword, perr := saltUtil.EncodePassword(randomPassword, salt)
+	if perr != nil {
+		return nil, perr
+	}
+
+	namePrefix := ""
+
+	if info.Name == "" {
+		namePrefix = "google_user"
+	} else {
+		namePrefix = info.Name
+	}
+
+	name, perr := m.randomUserName(tx, namePrefix)
+
+	if perr != nil {
+		return nil, perr
+	}
+
+	var user *models.User
+	if googleBinding == nil {
+		_, perr := m.getApplication(tx, login.AppID)
+		if perr != nil {
+			return nil, perr
+		}
+
+		user, perr = m.newUser(tx, name, info.Picture, encodedPassword, nil, true, login.AppID)
+		if perr != nil {
+			return nil, perr
+		}
+		googleBinding, perr = m.newBinding(tx, user.ID, info.Email, GOOGLELOGIN, info.Id, true, login.AppID)
+		if perr != nil {
+			return nil, perr
+		}
+	} else {
+		googleBinding.Mail = info.Email
+		if _, err := googleBinding.Update(tx, boil.Infer()); err != nil {
+			return nil, perror.ServerError.Wrapper(err)
+		}
+		user, err = models.Users(qm.Where("id = ?", googleBinding.UserID)).One(tx)
+		if err != nil {
+			return nil, perror.ServerError.Wrapper(err)
+		}
+	}
+
+	scopes, perr := getUserDefaultScopes(tx, user.ID, login.AppID)
+	if perr != nil {
+		return nil, perr
+	}
+
+	grantResult, perr := m.loginWithAppName(tx, user.ID, login.DeviceID, login.AppID, strings.Join(scopes, ","))
+	if perr != nil {
+		return nil, perr
+	}
+
+	tx.Commit()
+
+	return grantResult, nil
+}
+
 // googleIDTokenInfo struct
 type googleIDTokenInfo struct {
 	Iss string `json:"iss"`
@@ -351,7 +434,28 @@ type googleIDTokenInfo struct {
 	gjwt.StandardClaims
 }
 
-func verifyGoogleIdToken(idToken string) (*googleIDTokenInfo, *perror.PlutoError) {
+func verifyByGoogleAccessToken(accessToken string) (*oauth2.Userinfo, *perror.PlutoError) {
+	var httpClient = &http.Client{}
+	oauth2Service, err := oauth2.NewService(context.Background(), option.WithHTTPClient(httpClient))
+
+	if err != nil {
+		return nil, perror.InvalidGoogleAccessToken.Wrapper(err)
+	}
+
+	userInfoCall := oauth2Service.Userinfo.V2.Me.Get()
+	userInfoCall.Header().Add("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+	userInfo, err := userInfoCall.Do()
+	if err != nil {
+		return nil, perror.InvalidGoogleAccessToken.Wrapper(err)
+	}
+	if userInfo.Id == "" {
+		return nil, perror.InvalidGoogleIDToken
+	}
+
+	return userInfo, nil
+}
+
+func verifyByGoogleIdToken(idToken string) (*googleIDTokenInfo, *perror.PlutoError) {
 	var httpClient = &http.Client{}
 	oauth2Service, err := oauth2.NewService(context.Background(), option.WithHTTPClient(httpClient))
 
@@ -1567,7 +1671,7 @@ func (m *Manager) BindMail(binding *request.Binding, accessPayload *jwt.AccessPa
 
 func (m *Manager) BindGoogle(binding *request.Binding, accessPayload *jwt.AccessPayload) *perror.PlutoError {
 
-	info, perr := verifyGoogleIdToken(binding.IDToken)
+	info, perr := verifyByGoogleIdToken(binding.IDToken)
 	if perr != nil {
 		return perr
 	}
